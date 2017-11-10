@@ -1,0 +1,166 @@
+// "cpp": "cd $dir && g++ -o main *.cpp ./base/*.cpp -lSDL2 -lBox2D && ./main"
+
+// Using SDL and standard IO
+#include "base/system.h"
+#include <Box2D/Box2D.h>
+#include <SDL2/SDL.h>
+#include <stdio.h>
+
+// Screen dimension constants
+const int SCREEN_WIDTH = 1280;
+const int SCREEN_HEIGHT = 720;
+
+// Starts up SDL and creates window
+bool init();
+
+// Loads media
+bool loadMedia();
+
+// Frees media and shuts down SDL
+void close();
+
+// The window we'll be rendering to
+SDL_Window *gWindow = NULL;
+
+// The surface contained by the window
+SDL_Surface *gScreenSurface = NULL;
+
+// The image we will load and show on the screen
+SDL_Surface *gHelloWorld = NULL;
+
+bool init() {
+  System test;
+  test.init();
+  // Initialization flag
+  bool success = true;
+
+  // Initialize SDL
+  if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+    printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
+    success = false;
+  } else {
+    // Create window
+    gWindow = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED,
+                               SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH,
+                               SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    if (gWindow == NULL) {
+      printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
+      success = false;
+    } else {
+      // Get window surface
+      gScreenSurface = SDL_GetWindowSurface(gWindow);
+    }
+  }
+
+  return success;
+}
+
+bool loadMedia() {
+  // Loading success flag
+  bool success = true;
+
+  // Load splash image
+  gHelloWorld = SDL_LoadBMP("hello.bmp");
+  if (gHelloWorld == NULL) {
+    printf("Unable to load image %s! SDL Error: %s\n", "hello.bmp",
+           SDL_GetError());
+    success = false;
+  }
+
+  return success;
+}
+
+void close() {
+  // Deallocate surface
+  SDL_FreeSurface(gHelloWorld);
+  gHelloWorld = NULL;
+
+  // Destroy window
+  SDL_DestroyWindow(gWindow);
+  gWindow = NULL;
+
+  // Quit SDL subsystems
+  SDL_Quit();
+}
+
+int main(int argc, char *args[]) {
+  b2Vec2 gravity(0.0f, 9.8f);
+  b2World world(gravity);
+  b2Body *groundBody;
+  float32 timeStep = 1.0f / 60.0f;
+  int32 velocityIterations = 6;
+  int32 positionIterations = 2;
+
+  b2BodyDef bodyDef;
+  bodyDef.type = b2_dynamicBody;
+  bodyDef.position.Set(0.0f, 4.0f);
+  b2Body *body = world.CreateBody(&bodyDef);
+
+  // Define another box shape for our dynamic body.
+  b2PolygonShape dynamicBox;
+  dynamicBox.SetAsBox(1.0f, 1.0f);
+
+  // Define the dynamic body fixture.
+  b2FixtureDef fixtureDef;
+  fixtureDef.shape = &dynamicBox;
+
+  // Set the box density to be non-zero, so it will be dynamic.
+  fixtureDef.density = 1.0f;
+
+  // Override the default friction.
+  fixtureDef.friction = 0.3f;
+
+  // Add the shape to the body.
+  body->CreateFixture(&fixtureDef);
+
+  // Start up SDL and create window
+  if (!init()) {
+    printf("Failed to initialize!\n");
+  } else {
+    // Load media
+    if (!loadMedia()) {
+      printf("Failed to load media!\n");
+    } else {
+      bool quit = false;
+      SDL_Event e;
+
+      while (!quit) {
+        // Handle events on queue
+        while (SDL_PollEvent(&e) != 0) {
+          // User requests quit
+          if (e.type == SDL_QUIT) {
+            quit = true;
+          }
+        }
+
+        //SDL_RenderClear(renderer);
+
+        // update physic
+        world.Step(timeStep, velocityIterations, positionIterations);
+
+        SDL_Rect rect =
+            SDL_Rect{body->GetPosition().x, body->GetPosition().y, 0, 0};
+
+        // Apply the image
+        SDL_BlitSurface(gHelloWorld, NULL, gScreenSurface, &rect);
+
+        // Update the surface
+        SDL_UpdateWindowSurface(gWindow);
+      }
+
+      for (int32 i = 0; i < 60; ++i) {
+        world.Step(timeStep, velocityIterations, positionIterations);
+        b2Vec2 position = body->GetPosition();
+        float32 angle = body->GetAngle();
+
+        printf("%4.2f %4.2f %4.2f\n", position.x, position.y, angle);
+      }
+      printf("close %s", quit ? "true" : "false");
+    }
+  }
+
+  // Free resources and close SDL
+  close();
+
+  return 0;
+}
