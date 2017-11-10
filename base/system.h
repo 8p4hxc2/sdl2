@@ -21,4 +21,5 @@ public:
   // add an entity to the system
   void add(Entity *);
 };
+
 #endif

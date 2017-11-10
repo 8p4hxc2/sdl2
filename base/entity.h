@@ -6,4 +6,5 @@ private:
 public:
   void test();
 };
+
 #endif
