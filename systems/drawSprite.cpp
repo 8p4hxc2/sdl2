@@ -1,4 +1,4 @@
-#include "./drawSprite.h"
+#include "./drawSprite.hpp"
 #include <stdio.h>
 
 void DrawSprite::init() { printf("hahahahahaha"); };

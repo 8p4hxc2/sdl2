@@ -1,4 +1,4 @@
-#include "./system.h"
+#include "./system.hpp"
 #include <stdio.h>
 
 void System::add(Entity *entity) {

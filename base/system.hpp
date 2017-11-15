@@ -1,7 +1,7 @@
-#ifndef BASE_SYSTEM_H
-#define BASE_SYSTEM_H
+#ifndef BASE_SYSTEM_HPP
+#define BASE_SYSTEM_HPP
 
-#include "./entity.h"
+#include "./entity.hpp"
 #include <vector>
 
 class System {

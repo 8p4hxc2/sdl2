@@ -1,7 +1,7 @@
 #ifndef SYSTEMS_DRAWSPRITE_H
 #define SYSTEMS_DRAWSPRITE_H
 
-#include "../base/system.h"
+#include "../base/system.hpp"
 
 class DrawSprite : public System {
 private:

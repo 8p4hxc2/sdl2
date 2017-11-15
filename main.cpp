@@ -1,18 +1,9 @@
-#include "base/entity.h"
-#include "components/transform.h"
-#include "systems/drawSprite.h"
-#include <stdio.h>
+#include "core/engine.hpp"
 
 int main() {
-  Transform huhu(1, 1, 1, 1);
+  Engine undefine;
 
-  printf("%i", huhu.getX());
-  Entity e;
-  Entity f;
-  DrawSprite t;
-  t.add(&e);
-  t.add(&f);
-  t.draw();
-
+  undefine.load();
+  undefine.run();
   return 0;
-}
+};

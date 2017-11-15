@@ -1,7 +1,7 @@
 #ifndef COMPONENTS_TRANSFORM_H
 #define COMPONENTS_TRANSFORM_H
 
-#include "../base/component.h"
+#include "../base/component.hpp"
 
 class Transform : public Component {
 private:
